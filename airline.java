@@ -1,102 +1,219 @@
-class Flight:
-    def __init__(self, flight_number, origin, destination, seats):
-        self.flight_number = flight_number
-        self.origin = origin
-        self.destination = destination
-        self.seats = seats
-        self.available_seats = seats
-        self.passengers = []
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
 
-    def book_seat(self, passenger):
-        if self.available_seats > 0:
-            self.passengers.append(passenger)
-            self.available_seats -= 1
-            return True
-        else:
-            return False
+// Passenger class
+class Passenger {
+    private String name;
+    private String passportNumber;
 
-    def cancel_seat(self, passenger):
-        if passenger in self.passengers:
-            self.passengers.remove(passenger)
-            self.available_seats += 1
-            return True
-        else:
-            return False
+    public Passenger(String name, String passportNumber) {
+        this.name = name;
+        this.passportNumber = passportNumber;
+    }
 
-class Passenger:
-    def __init__(self, name, passport_number):
-        self.name = name
-        self.passport_number = passport_number
+    public String getName() {
+        return name;
+    }
 
-class ReservationSystem:
-    def __init__(self):
-        self.flights = []
-        self.passengers = []
+    public String getPassportNumber() {
+        return passportNumber;
+    }
 
-    def add_flight(self, flight):
-        self.flights.append(flight)
+    @Override
+    public String toString() {
+        return name + " (" + passportNumber + ")";
+    }
+}
 
-    def add_passenger(self, passenger):
-        self.passengers.append(passenger)
+// Flight class
+class Flight {
+    private String flightNumber;
+    private String origin;
+    private String destination;
+    private int totalSeats;
+    private int availableSeats;
+    private List<Passenger> passengers;
 
-    def book_flight(self, flight_number, passenger):
-        for flight in self.flights:
-            if flight.flight_number == flight_number:
-                if flight.book_seat(passenger):
-                    return "Booking successful!"
-                else:
-                    return "No available seats."
-        return "Flight not found."
+    public Flight(String flightNumber, String origin, String destination, int totalSeats) {
+        this.flightNumber = flightNumber;
+        this.origin = origin;
+        this.destination = destination;
+        this.totalSeats = totalSeats;
+        this.availableSeats = totalSeats;
+        this.passengers = new ArrayList<>();
+    }
 
-    def cancel_reservation(self, flight_number, passenger):
-        for flight in self.flights:
-            if flight.flight_number == flight_number:
-                if flight.cancel_seat(passenger):
-                    return "Cancellation successful!"
-                else:
-                    return "Passenger not found."
-        return "Flight not found."
+    public boolean bookSeat(Passenger passenger) {
+        if (availableSeats > 0) {
+            passengers.add(passenger);
+            availableSeats--;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    def view_flights(self):
-        for flight in self.flights:
-            print(f"Flight {flight.flight_number}: {flight.origin} to {flight.destination}, Available seats: {flight.available_seats}")
+    public boolean cancelSeat(Passenger passenger) {
+        if (passengers.remove(passenger)) {
+            availableSeats++;
+            return true;
+        } else {
+            return false;
+        }
+    }
 
-    def view_passengers(self, flight_number):
-        for flight in self.flights:
-            if flight.flight_number == flight_number:
-                print(f"Passengers on flight {flight_number}:")
-                for passenger in flight.passengers:
-                    print(f"{passenger.name} ({passenger.passport_number})")
-                return
-        print("Flight not found.")
+    public String getFlightNumber() {
+        return flightNumber;
+    }
 
-# Example usage
-system = ReservationSystem()
+    public String getOrigin() {
+        return origin;
+    }
 
-# Adding flights
-flight1 = Flight("A123", "New York", "Los Angeles", 5)
-flight2 = Flight("B456", "Boston", "Miami", 3)
-system.add_flight(flight1)
-system.add_flight(flight2)
+    public String getDestination() {
+        return destination;
+    }
 
-# Adding passengers
-passenger1 = Passenger("John Doe", "P123456")
-passenger2 = Passenger("Jane Smith", "P789101")
-system.add_passenger(passenger1)
-system.add_passenger(passenger2)
+    public int getAvailableSeats() {
+        return availableSeats;
+    }
 
-# Booking flights
-print(system.book_flight("A123", passenger1))  # Booking successful!
-print(system.book_flight("A123", passenger2))  # Booking successful!
+    public List<Passenger> getPassengers() {
+        return passengers;
+    }
+}
 
-# Viewing flights
-system.view_flights()
+// ReservationSystem class
+class ReservationSystem {
+    private List<Flight> flights;
 
-# Viewing passengers on a flight
-system.view_passengers("A123")
+    public ReservationSystem() {
+        this.flights = new ArrayList<>();
+    }
 
-# Cancelling reservation
-print(system.cancel_reservation("A123", passenger1))  # Cancellation successful!
+    public void addFlight(Flight flight) {
+        flights.add(flight);
+    }
 
-# Viewing passengers on a flight after cancellation
-system.view_passengers("A123")
+    public boolean bookFlight(String flightNumber, Passenger passenger) {
+        for (Flight flight : flights) {
+            if (flight.getFlightNumber().equals(flightNumber)) {
+                return flight.bookSeat(passenger);
+            }
+        }
+        return false;
+    }
+
+    public boolean cancelReservation(String flightNumber, Passenger passenger) {
+        for (Flight flight : flights) {
+            if (flight.getFlightNumber().equals(flightNumber)) {
+                return flight.cancelSeat(passenger);
+            }
+        }
+        return false;
+    }
+
+    public void displayFlights() {
+        System.out.println("Available Flights:");
+        for (Flight flight : flights) {
+            System.out.println(flight.getFlightNumber() + ": " + flight.getOrigin() + " to " + flight.getDestination() +
+                    ", Available Seats: " + flight.getAvailableSeats());
+        }
+        System.out.println();
+    }
+
+    public void displayPassengers(String flightNumber) {
+        for (Flight flight : flights) {
+            if (flight.getFlightNumber().equals(flightNumber)) {
+                System.out.println("Passengers on Flight " + flightNumber + ":");
+                for (Passenger passenger : flight.getPassengers()) {
+                    System.out.println("- " + passenger);
+                }
+                return;
+            }
+        }
+        System.out.println("Flight not found.");
+    }
+}
+
+// Main class
+public class AirlineReservationSystem {
+    public static void main(String[] args) {
+        ReservationSystem system = new ReservationSystem();
+
+        // Adding some sample flights
+        Flight flight1 = new Flight("F001", "New York", "Los Angeles", 50);
+        Flight flight2 = new Flight("F002", "Chicago", "Miami", 40);
+        Flight flight3 = new Flight("F003", "San Francisco", "Seattle", 30);
+
+        system.addFlight(flight1);
+        system.addFlight(flight2);
+        system.addFlight(flight3);
+
+        Scanner scanner = new Scanner(System.in);
+        boolean running = true;
+
+        while (running) {
+            System.out.println("1. Book a Flight");
+            System.out.println("2. Cancel Reservation");
+            System.out.println("3. View Flights");
+            System.out.println("4. View Passengers");
+            System.out.println("5. Exit");
+            System.out.print("Enter your choice: ");
+
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.println("Enter Flight Number:");
+                    String flightNumber = scanner.nextLine();
+                    System.out.println("Enter Passenger Name:");
+                    String passengerName = scanner.nextLine();
+                    System.out.println("Enter Passport Number:");
+                    String passportNumber = scanner.nextLine();
+
+                    Passenger passenger = new Passenger(passengerName, passportNumber);
+                    if (system.bookFlight(flightNumber, passenger)) {
+                        System.out.println("Booking successful!");
+                    } else {
+                        System.out.println("Booking failed. No available seats.");
+                    }
+                    break;
+                case 2:
+                    System.out.println("Enter Flight Number:");
+                    flightNumber = scanner.nextLine();
+                    System.out.println("Enter Passenger Name:");
+                    passengerName = scanner.nextLine();
+                    System.out.println("Enter Passport Number:");
+                    passportNumber = scanner.nextLine();
+
+                    passenger = new Passenger(passengerName, passportNumber);
+                    if (system.cancelReservation(flightNumber, passenger)) {
+                        System.out.println("Cancellation successful!");
+                    } else {
+                        System.out.println("Cancellation failed. Passenger not found or flight not found.");
+                    }
+                    break;
+                case 3:
+                    system.displayFlights();
+                    break;
+                case 4:
+                    System.out.println("Enter Flight Number:");
+                    flightNumber = scanner.nextLine();
+                    system.displayPassengers(flightNumber);
+                    break;
+                case 5:
+                    running = false;
+                    System.out.println("Exiting...");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Please enter a number between 1 and 5.");
+            }
+            System.out.println();
+        }
+
+        scanner.close();
+    }
+}
